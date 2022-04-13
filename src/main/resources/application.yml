@@ -1,0 +1,74 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: history-service
+  sql:
+    init:
+      mode: always
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: example
+  cloud:
+    function:
+      definition: flagPersonQueueListener;savePersonQueueListener;updatePersonQueueListener;deletePersonQueueListener;flagTransactionQueueListener;
+    stream:
+      bindings:
+        flagPersonQueueListener-in-0:
+          destination: flagpersonexchange
+          group: flagpersonqueue
+        savePersonQueueListener-in-0:
+          destination: savepersonexchange
+          group: savepersonqueue
+        updatePersonQueueListener-in-0:
+          destination: updatepersonexchange
+          group: updatepersonqueue
+        deletePersonQueueListener-in-0:
+          destination: deletepersonexchange
+          group: deletepersonqueue
+        flagTransactionQueueListener-in-0:
+          destination: flagtransactionexchange
+          group: flagtransactionqueue
+      rabbit:
+        bindings:
+          flagPersonQueueListener-in-0:
+            consumer:
+              queueNameGroupOnly: true
+              binding-routing-key-delimiter: ","
+              bindingRoutingKey: "flagpersonroutingkey"
+              exchangeType: direct
+              autoBindDlq: false
+          savePersonQueueListener-in-0:
+            consumer:
+              queueNameGroupOnly: true
+              binding-routing-key-delimiter: ","
+              bindingRoutingKey: "savepersonroutingkey"
+              exchangeType: direct
+              autoBindDlq: false
+          updatePersonQueueListener-in-0:
+            consumer:
+              queueNameGroupOnly: true
+              binding-routing-key-delimiter: ","
+              bindingRoutingKey: "updatepersonroutingkey"
+              exchangeType: direct
+              autoBindDlq: false
+          deletePersonQueueListener-in-0:
+            consumer:
+              queueNameGroupOnly: true
+              binding-routing-key-delimiter: ","
+              bindingRoutingKey: "deletepersonroutingkey"
+              exchangeType: direct
+              autoBindDlq: false
+          flagTransactionQueueListener-in-0:
+            consumer:
+              queueNameGroupOnly: true
+              binding-routing-key-delimiter: ","
+              bindingRoutingKey: "flagtransactionroutingkey"
+              exchangeType: direct
+              autoBindDlq: false
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: DEBUG
