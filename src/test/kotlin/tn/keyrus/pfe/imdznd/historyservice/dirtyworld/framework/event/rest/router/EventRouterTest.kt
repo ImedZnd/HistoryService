@@ -17,9 +17,7 @@ import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.repository.ReactiveD
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.rest.handler.EventHandler
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.framework.initializer.Initializer
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date
-import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date.Builder.toDTO
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.DateRange
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @SpringBootTest
