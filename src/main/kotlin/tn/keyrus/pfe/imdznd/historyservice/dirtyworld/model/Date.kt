@@ -9,15 +9,6 @@ data class Date(
     val month: Int,
     val year: Int
 ) {
-    companion object Builder {
-        fun LocalDate.toDTO() {
-            Date(
-                this.dayOfMonth,
-                this.monthValue,
-                this.year,
-            )
-        }
-    }
 
     fun checkDate(): Either<DateError, Date> {
         print("is the date right : "+this.toLocalDate().isRight)

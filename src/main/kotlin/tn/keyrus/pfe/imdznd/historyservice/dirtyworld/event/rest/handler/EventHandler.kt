@@ -106,6 +106,5 @@ class EventHandler(
         ).map { it.toEventDTO() }
     }
 
-    object BadDatesInRequest
     object BadEventAction
 }
