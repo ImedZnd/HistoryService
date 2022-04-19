@@ -48,9 +48,9 @@ class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext
             ApplicationListener<ContextClosedEvent> {
                 runBlocking {
                     postgreSQLContainer.stop()
-                    rabbitMQContainer.stop()
                     while (postgreSQLContainer.isRunning)
                         delay(1000)
+                    rabbitMQContainer.stop()
                     while (rabbitMQContainer.isRunning)
                         delay(1000)
                 }

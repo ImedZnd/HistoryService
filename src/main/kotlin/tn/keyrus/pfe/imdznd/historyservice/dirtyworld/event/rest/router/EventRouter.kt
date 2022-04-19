@@ -14,8 +14,8 @@ class EventRouter() {
             GET("") { eventHandler.getAllEvents() }
             GET("/action/{action}", eventHandler::getAllEventsByAction)
             GET("/objectId/{objectId}", eventHandler::getAllEventsByObjectId)
-            GET("/daterange/{startDate}/{endDate}", eventHandler::getAllEventsByBetweenRange)
-            GET("/date/{date}", eventHandler::getAllEventsBySpecifiedDate)
+            POST("/daterange", eventHandler::getAllEventsByBetweenRange)
+            POST("/date",eventHandler::getAllEventsBySpecifiedDate)
         }
     }
 }

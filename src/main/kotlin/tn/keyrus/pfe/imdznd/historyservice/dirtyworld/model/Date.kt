@@ -1,54 +1,44 @@
 package tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model
 
 import io.vavr.control.Either
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.NoArgsConstructor
 import java.time.DateTimeException
 import java.time.LocalDate
-import java.time.LocalDateTime
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class Date(
-    private val day: Int,
-    private val month: Int,
-    private val year: Int
+data class Date(
+    val day: Int,
+    val month: Int,
+    val year: Int
 ) {
-    companion object Builder{
-        fun stringToLocalDate(date: String): Either<DateError, LocalDate> {
-            val dateAsString = date.split('-')
-            return try {
-                Either.right(
-                    LocalDate.of(
-                        dateAsString[0].toInt(),
-                        dateAsString[1].toInt(),
-                        dateAsString[2].toInt()
-                    )
-                )
-            } catch (exception: Exception) {
-                Either.left(DateError)
-            }
+    companion object Builder {
+        fun LocalDate.toDTO() {
+            Date(
+                this.dayOfMonth,
+                this.monthValue,
+                this.year,
+            )
         }
     }
 
-//    fun toLocalDateTime(): Either<DateTimeException, LocalDateTime> {
-//        return try {
-//            Either.right(
-//                LocalDateTime.of(
-//                    year,
-//                    month,
-//                    day,
-//                    0,
-//                    0,
-//                    0
-//                )
-//            )
-//        } catch (dateTimeException: DateTimeException) {
-//            Either.left(dateTimeException)
-//        }
-//    }
+    fun checkDate(): Either<DateError, Date> {
+        print("is the date right : "+this.toLocalDate().isRight)
+        print(this.toLocalDate())
+        if (this.toLocalDate().get().isAfter(LocalDate.now()))
+            return Either.left(DateError)
+        return Either.right(this)
+    }
+
+    fun toLocalDate(): Either<DateError, LocalDate> =
+        try {
+            Either.right(
+                LocalDate.of(
+                    year,
+                    month,
+                    day
+                )
+            )
+        } catch (dateTimeException: DateTimeException) {
+            Either.left(DateError)
+        }
 
     object DateError
 }
