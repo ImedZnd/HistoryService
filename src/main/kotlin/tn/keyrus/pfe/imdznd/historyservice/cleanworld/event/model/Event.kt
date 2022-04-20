@@ -50,7 +50,7 @@ class Event private constructor(
         private fun checkEvent(
             objectId: String,
             eventTime: LocalDateTime
-        ): Sequence<EventError> =
+        ) =
             sequenceOf(
                 checkObjectId(objectId),
                 checkEventTime(eventTime),
@@ -58,7 +58,7 @@ class Event private constructor(
                 .filter { it.isPresent }
                 .map { it.get() }
 
-        private fun checkEventTime(eventTime: LocalDateTime): Optional<EventError> =
+        private fun checkEventTime(eventTime: LocalDateTime) =
             checkField(
                 eventTime,
                 EventError.EventTimeError

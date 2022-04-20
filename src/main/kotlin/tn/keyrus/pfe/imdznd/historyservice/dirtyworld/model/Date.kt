@@ -2,34 +2,46 @@ package tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model
 
 import io.vavr.control.Either
 import java.time.DateTimeException
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class Date(
     val day: Int,
     val month: Int,
-    val year: Int
+    val year: Int,
+    val hour: Int = 0,
+    val minute: Int = 0,
+    val second: Int = 0,
 ) {
 
-    fun checkDate(): Either<DateError, Date> {
-        print("is the date right : "+this.toLocalDate().isRight)
-        print(this.toLocalDate())
-        if (this.toLocalDate().get().isAfter(LocalDate.now()))
-            return Either.left(DateError)
-        return Either.right(this)
-    }
-
-    fun toLocalDate(): Either<DateError, LocalDate> =
+    fun toLocalDateTime(): Either<DateError, LocalDateTime> =
         try {
             Either.right(
-                LocalDate.of(
+                LocalDateTime.of(
                     year,
                     month,
-                    day
+                    day,
+                    hour,
+                    minute,
+                    second
                 )
             )
         } catch (dateTimeException: DateTimeException) {
             Either.left(DateError)
         }
+
+    companion object {
+
+        fun LocalDateTime.toDate() =
+            Date(
+                this.year,
+                this.monthValue,
+                this.dayOfMonth,
+                this.hour,
+                this.minute,
+                this.second
+            )
+
+    }
 
     object DateError
 }

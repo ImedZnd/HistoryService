@@ -1,24 +1,22 @@
 package tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model
 
-import io.vavr.control.Either
-import java.time.LocalDate
+import java.util.*
 
 data class DateRange(
-    val startDate:Date,
-    val endDate:Date,
-){
+    val startDate: Date,
+    val endDate: Date = startDate,
+) {
+    fun checkStartDateAndEndDate() =
+        when {
+            this.startDate.toLocalDateTime().isLeft or this.endDate.toLocalDateTime().isLeft ->
+                Optional.of(DateRangeError.DateIsNotValidError)
+            this.startDate.toLocalDateTime().get()!!.isAfter(this.endDate.toLocalDateTime().get()!!) ->
+                Optional.of(DateRangeError.EndDateBeforeStartDateError)
+            else -> Optional.empty()
+        }
 
-    fun checkStartDateAndEndDate():Either<DateRangeError,DateRange>{
-        if (checkDateIsRight(startDate).isLeft or checkDateIsRight(endDate).isLeft or checkStartDateIsBeforeEndDate().not())
-            return Either.left(DateRangeError)
-        return Either.right(DateRange(startDate,endDate))
+    sealed interface DateRangeError {
+        object DateIsNotValidError : DateRangeError
+        object EndDateBeforeStartDateError : DateRangeError
     }
-
-    private fun checkDateIsRight(date: Date) =
-        date.toLocalDate()
-
-    private fun checkStartDateIsBeforeEndDate() =
-        startDate.toLocalDate().get().isBefore(endDate.toLocalDate().get())
-
-    object DateRangeError
 }

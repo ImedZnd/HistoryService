@@ -14,7 +14,7 @@ import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.model.Event
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.service.EventService
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dto.EventDTO
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.repository.ReactiveDatabaseRepository
-import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.rest.handler.EventHandler
+import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.rest.handler.EventRestHandler
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.framework.initializer.Initializer
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.DateRange
@@ -142,7 +142,7 @@ internal class EventRouterTest(
                 .exchange()
                 .expectStatus()
                 .isBadRequest
-                .expectBodyList<EventHandler.BadEventAction>()
+                .expectBodyList<EventRestHandler.BadEventAction>()
                 .hasSize(1)
         }
     }

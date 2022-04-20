@@ -1,7 +1,6 @@
 package tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.repository
 
 import io.vavr.control.Either
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.reactive.asFlow
@@ -13,7 +12,7 @@ import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dao.EventDAO
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dao.EventDAO.Companion.toDAO
 import java.time.LocalDate
 
-class DatabaseRepository (
+class DatabaseRepository(
     private val reactiveDatabaseRepository: ReactiveDatabaseRepository
 ) : EventRepository {
 
@@ -21,13 +20,18 @@ class DatabaseRepository (
         findAllEventsByCriteria { it.findAll() }
 
     override fun findAllEventByAction(eventAction: Event.EventAction) =
-        findAllEventsByCriteria { it.findAllByAction(eventAction)}
+        findAllEventsByCriteria { it.findAllByAction(eventAction) }
 
     override fun findAllEventByObjectId(objectId: String) =
-        findAllEventsByCriteria { it.findAllByObjectId(objectId)}
+        findAllEventsByCriteria { it.findAllByObjectId(objectId) }
 
     override fun findAllEventByDateRange(startDate: LocalDate, endDate: LocalDate) =
-        findAllEventsByCriteria { it.findAllByEventTimeBetween(startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay()) }
+        findAllEventsByCriteria {
+            it.findAllByEventTimeBetween(
+                startDate.atStartOfDay(),
+                endDate.plusDays(1).atStartOfDay().minusNanos(1)
+            )
+        }
 
     override suspend fun saveEvent(event: Event): Either<EventRepository.EventRepositoryIOError, Event> =
         try {
@@ -43,10 +47,11 @@ class DatabaseRepository (
             Either.left(EventRepository.EventRepositoryIOError)
         }
 
-    private fun findAllEventsByCriteria(criteria: (ReactiveDatabaseRepository) -> Flux<EventDAO>): Flow<Event> =
+    private fun findAllEventsByCriteria(criteria: (ReactiveDatabaseRepository) -> Flux<EventDAO>) =
         criteria(reactiveDatabaseRepository)
             .asFlow()
             .map { it.toEvent() }
             .filter { it.isRight }
             .map { it.get() }
+
 }

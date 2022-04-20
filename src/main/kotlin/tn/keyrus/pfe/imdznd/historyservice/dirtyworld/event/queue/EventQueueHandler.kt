@@ -1,27 +1,32 @@
 package tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.queue
 
-import org.springframework.beans.factory.annotation.Autowired
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.model.Event
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.service.EventService
 import java.time.LocalDateTime
 
 class EventQueueHandler(
-    @Autowired private val eventService: EventService
+    private val eventService: EventService
 ) {
-    suspend fun flagPersonHandler(objectId: String) =
+
+    suspend fun flagPersonHandler(objectId: String) {
         createEvent(Event.EventAction.FLAGUSER, objectId)
+    }
 
-    suspend fun savePersonHandler(objectId: String) =
+    suspend fun savePersonHandler(objectId: String) {
         createEvent(Event.EventAction.SAVEUSER, objectId)
+    }
 
-    suspend fun updatePersonHandler(objectId: String) =
+    suspend fun updatePersonHandler(objectId: String) {
         createEvent(Event.EventAction.UPDATEUSER, objectId)
+    }
 
-    suspend fun deletePersonHandler(objectId: String) =
+    suspend fun deletePersonHandler(objectId: String) {
         createEvent(Event.EventAction.DELETEUSER, objectId)
+    }
 
-    suspend fun flagTransactionHandler(objectId: String) =
+    suspend fun flagTransactionHandler(objectId: String) {
         createEvent(Event.EventAction.FLAGTRANSACTION, objectId)
+    }
 
     private suspend fun createEvent(
         action: Event.EventAction,

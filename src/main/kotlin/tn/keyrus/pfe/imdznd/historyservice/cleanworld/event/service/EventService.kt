@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 class EventService(
     private val eventRepository: EventRepository
-    ){
+) {
 
     fun getAllEvents() =
         eventRepository.findAllEvents()
@@ -15,13 +15,13 @@ class EventService(
     fun getAllEventByAction(eventAction: Event.EventAction) =
         eventRepository.findAllEventByAction(eventAction)
 
-    fun getAllEventByObjectId(objectId:String) =
+    fun getAllEventByObjectId(objectId: String) =
         eventRepository.findAllEventByObjectId(objectId)
 
     fun getAllEventBetweenRange(startDate: LocalDate, endDate: LocalDate) =
-        eventRepository.findAllEventByDateRange(startDate,endDate)
+        eventRepository.findAllEventByDateRange(startDate, endDate)
 
-    suspend fun saveEvent(event:Event):Either<EventServiceIOError,Event> =
+    suspend fun saveEvent(event: Event): Either<EventServiceIOError, Event> =
         eventRepository.saveEvent(event)
             .mapLeft { EventServiceIOError }
 

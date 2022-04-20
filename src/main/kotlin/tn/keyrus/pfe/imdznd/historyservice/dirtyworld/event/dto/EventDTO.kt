@@ -2,6 +2,7 @@ package tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dto
 
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.model.Event
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date
+import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date.Companion.toDate
 
 data class EventDTO(
     val action: Event.EventAction,
@@ -13,11 +14,7 @@ data class EventDTO(
             EventDTO(
                 action,
                 objectId,
-                Date(
-                    year = eventTime.year,
-                    month = eventTime.monthValue,
-                    day = eventTime.dayOfMonth
-                )
+                eventTime.toDate()
             )
     }
 }

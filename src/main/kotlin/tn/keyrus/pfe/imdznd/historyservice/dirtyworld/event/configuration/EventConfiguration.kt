@@ -7,7 +7,7 @@ import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.service.EventService
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.queue.EventQueueHandler
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.repository.DatabaseRepository
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.repository.ReactiveDatabaseRepository
-import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.rest.handler.EventHandler
+import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.rest.handler.EventRestHandler
 
 @Configuration
 class EventConfiguration {
@@ -20,19 +20,20 @@ class EventConfiguration {
 
     @Bean
     fun eventService(
-        databaseRepository: EventRepository
-    ): EventService =
-        EventService(databaseRepository)
+        eventRepository: EventRepository
+    ) =
+        EventService(eventRepository)
 
     @Bean
     fun eventHandler(
         eventService: EventService
-    ): EventHandler =
-        EventHandler(eventService)
+    ) =
+        EventRestHandler(eventService)
 
     @Bean
     fun eventQueueHandler(
         eventService: EventService
-    ): EventQueueHandler =
+    ) =
         EventQueueHandler(eventService)
+
 }
