@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.MessageSource
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -19,6 +20,7 @@ import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.framework.initializer.Init
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.DateRange
 import java.time.LocalDateTime
+import java.util.*
 
 @SpringBootTest
 @ContextConfiguration(initializers = [Initializer::class])
@@ -27,7 +29,9 @@ import java.time.LocalDateTime
 internal class EventRouterTest(
     @Autowired private val reactiveDatabaseRepository: ReactiveDatabaseRepository,
     @Autowired private val webTestClient: WebTestClient,
-    @Autowired private val eventService: EventService
+    @Autowired private val eventService: EventService,
+    @Autowired private val messageSource: MessageSource
+
 ) {
     @BeforeAll
     fun beforeAll() {
@@ -142,20 +146,20 @@ internal class EventRouterTest(
                 .exchange()
                 .expectStatus()
                 .isBadRequest
-                .expectBodyList<EventRestHandler.BadEventAction>()
-                .hasSize(1)
+                .expectHeader()
+                .valueMatches("error",messageSource.getMessage("BadEventAction", null, Locale.US))
         }
     }
 
     @Test
     fun `list of one ,single element with specified date `() {
         runBlocking {
-            val date = Date(1,1,2022)
+            val date = Date(2020,5,5)
             val event =
                 Event.of(
                     Event.EventAction.SAVEUSER,
                     "x",
-                    LocalDateTime.of(2022,1,1,1,1,1)
+                    LocalDateTime.of(2020,5,5,1,1,1)
                 )
             println(event.isRight)
             eventService.saveEvent(
@@ -192,17 +196,17 @@ internal class EventRouterTest(
                 .body(BodyInserters.fromValue(date2))
                 .exchange()
                 .expectStatus()
-                .isOk
-                .expectBodyList<EventDTO>()
-                .hasSize(1)
+                .isBadRequest
+                .expectHeader()
+                .valueMatches("error",messageSource.getMessage("DateError", null, Locale.US))
         }
     }
 
     @Test
     fun `two element on date range `() {
         runBlocking {
-            val date1 = Date(1,1,2017)
-            val date2 = Date(1,1,2022)
+            val date1 = Date(2017,1,1)
+            val date2 = Date(2022,1,1)
             eventService.saveEvent(
                 Event.of(
                     Event.EventAction.SAVEUSER,
@@ -228,6 +232,38 @@ internal class EventRouterTest(
                 .isOk
                 .expectBodyList<EventDTO>()
                 .hasSize(2)
+        }
+    }
+    @Test
+    fun `bad request when start date is after end date two element on date range `() {
+        runBlocking {
+            val date1 = Date(2021,1,1)
+            val date2 = Date(2020,1,1)
+            eventService.saveEvent(
+                Event.of(
+                    Event.EventAction.SAVEUSER,
+                    "x",
+                    LocalDateTime.now().minusYears(1)
+                ).get()
+            )
+            eventService.saveEvent(
+                Event.of(
+                    Event.EventAction.SAVEUSER,
+                    "mmm",
+                    LocalDateTime.now().minusYears(1)
+                ).get()
+            )
+            val dateVal = DateRange(date1,date2)
+            webTestClient
+                .post()
+                .uri("/events/daterange")
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(dateVal))
+                .exchange()
+                .expectStatus()
+                .isBadRequest
+                .expectHeader()
+                .valueMatches("error",messageSource.getMessage("EndDateBeforeStartDateError", null, Locale.US))
         }
     }
 

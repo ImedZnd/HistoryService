@@ -1,5 +1,7 @@
 package tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.configuration
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.repository.EventRepository
@@ -26,9 +28,10 @@ class EventConfiguration {
 
     @Bean
     fun eventHandler(
-        eventService: EventService
+        eventService: EventService,
+        @Autowired messageSource: MessageSource
     ) =
-        EventRestHandler(eventService)
+        EventRestHandler(eventService,messageSource)
 
     @Bean
     fun eventQueueHandler(

@@ -5,9 +5,9 @@ import java.time.DateTimeException
 import java.time.LocalDateTime
 
 data class Date(
-    val day: Int,
-    val month: Int,
     val year: Int,
+    val month: Int,
+    val dayofmonth: Int,
     val hour: Int = 0,
     val minute: Int = 0,
     val second: Int = 0,
@@ -19,7 +19,7 @@ data class Date(
                 LocalDateTime.of(
                     year,
                     month,
-                    day,
+                    dayofmonth,
                     hour,
                     minute,
                     second

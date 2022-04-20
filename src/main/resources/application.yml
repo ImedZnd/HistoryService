@@ -3,6 +3,9 @@ server:
 spring:
   application:
     name: history-service
+  messages:
+    basename: "messages"
+    fallback-to-system-locale: false
   sql:
     init:
       mode: always

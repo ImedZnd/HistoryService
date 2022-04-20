@@ -1,20 +1,25 @@
 package tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.rest.handler
 
 import io.vavr.control.Either
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.springframework.context.MessageSource
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.badRequest
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.model.Event
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.service.EventService
+import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dto.EventDTO
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dto.EventDTO.Builder.toEventDTO
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date.Companion.toDate
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.DateRange
 import java.time.LocalDateTime
+import java.util.*
 
 class EventRestHandler(
-    private val eventService: EventService
+    private val eventService: EventService,
+    private val messageSource: MessageSource
 ) {
 
     suspend fun getAllEvents() =
@@ -39,7 +44,7 @@ class EventRestHandler(
             badRequest()
                 .header(
                     "error",
-                    BadEventAction //use i18N file to get message from error
+                    headerErrorInBadRequestError("BadEventAction")
                 )
                 .buildAndAwait()
         }
@@ -81,7 +86,7 @@ class EventRestHandler(
         return badRequest()
             .header(
                 "error",
-                this//use i18N file to get message from error
+                headerErrorInBadRequestError("EndDateBeforeStartDateError")
             )
             .buildAndAwait()
     }
@@ -90,10 +95,13 @@ class EventRestHandler(
         return badRequest()
             .header(
                 "error",
-                this//use i18N file to get message from error
+                headerErrorInBadRequestError("DateError")
             )
             .buildAndAwait()
     }
+
+    private fun headerErrorInBadRequestError(string: String) =
+        messageSource.getMessage(string, null, Locale.US)
 
     private suspend fun okResponse(startDate: Date, endDate: Date = startDate) =
         ok()
@@ -101,12 +109,11 @@ class EventRestHandler(
                 getAllEventsInRange(startDate, endDate)
             )
 
-    private fun getAllEventsInRange(startDate: Date, endDate: Date = startDate) =
-        eventService.getAllEventBetweenRange(
+    private fun getAllEventsInRange(startDate: Date, endDate: Date = startDate): Flow<EventDTO> {
+        return eventService.getAllEventBetweenRange(
             startDate.toLocalDateTime().get().toLocalDate(),
             endDate.toLocalDateTime().get().toLocalDate()
         )
-            .map { it.toEventDTO() }
-
-    object BadEventAction
+            .map{ it.toEventDTO() }
+    }
 }
