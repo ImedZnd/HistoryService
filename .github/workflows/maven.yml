@@ -59,7 +59,6 @@ jobs:
           docker login -u imedznd -p ${{secrets.DOCKER_PASS}}
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag imedznd/history-service:latest
-
       - name: Docker Push
         run: docker push imedznd/history-service
 
