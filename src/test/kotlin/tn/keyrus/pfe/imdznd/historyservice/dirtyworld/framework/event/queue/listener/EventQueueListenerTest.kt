@@ -73,7 +73,7 @@ internal class EventQueueListenerTest(
                     "flagpersonroutingkey",
                     userId
                 )
-                Thread.sleep(5000)
+                Thread.sleep(1000)
                 val result = eventService.getAllEvents().count()
                 val detailRes = eventService.getAllEventByObjectId(userId).first()
                 assertAll(
@@ -95,7 +95,7 @@ internal class EventQueueListenerTest(
                     "savepersonroutingkey",
                     userId
                 )
-                Thread.sleep(5000)
+                Thread.sleep(1000)
                 val result = eventService.getAllEvents().count()
                 val detailRes = eventService.getAllEventByObjectId(userId).first()
                 assertAll(
@@ -117,7 +117,7 @@ internal class EventQueueListenerTest(
                     "updatepersonroutingkey",
                     userId
                 )
-                Thread.sleep(5000)
+                Thread.sleep(1000)
                 val result = eventService.getAllEvents().count()
                 val detailRes = eventService.getAllEventByObjectId(userId).first()
                 assertAll(
@@ -139,7 +139,7 @@ internal class EventQueueListenerTest(
                     "deletepersonroutingkey",
                     userId
                 )
-                Thread.sleep(5000)
+                Thread.sleep(1000)
                 val result = eventService.getAllEvents().count()
                 val detailRes = eventService.getAllEventByObjectId(userId).first()
                 assertAll(
@@ -161,7 +161,7 @@ internal class EventQueueListenerTest(
                     "flagtransactionroutingkey",
                     userId
                 )
-                Thread.sleep(5000)
+                Thread.sleep(1000)
                 val result = eventService.getAllEvents().count()
                 val detailRes = eventService.getAllEventByObjectId(userId).first()
                 assertAll(

@@ -5,17 +5,22 @@ import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.MessageSource
+import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBodyList
+import org.springframework.web.reactive.function.BodyInserters
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.model.Event
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.service.EventService
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dto.EventDTO
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.repository.ReactiveDatabaseRepository
-import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.rest.handler.EventHandler
+import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.rest.handler.EventRestHandler
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.framework.initializer.Initializer
-import java.time.LocalDate
+import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date
+import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.DateRange
 import java.time.LocalDateTime
+import java.util.*
 
 @SpringBootTest
 @ContextConfiguration(initializers = [Initializer::class])
@@ -24,7 +29,9 @@ import java.time.LocalDateTime
 internal class EventRouterTest(
     @Autowired private val reactiveDatabaseRepository: ReactiveDatabaseRepository,
     @Autowired private val webTestClient: WebTestClient,
-    @Autowired private val eventService: EventService
+    @Autowired private val eventService: EventService,
+    @Autowired private val messageSource: MessageSource
+
 ) {
     @BeforeAll
     fun beforeAll() {
@@ -62,7 +69,7 @@ internal class EventRouterTest(
 
     @Test
     fun `list of one if repository contains one element on get all`() {
-        runBlocking{
+        runBlocking {
             eventService.saveEvent(
                 Event.of(
                     Event.EventAction.SAVEUSER,
@@ -83,7 +90,7 @@ internal class EventRouterTest(
 
     @Test
     fun `list of one if repository contains one element on get by action upper case action`() {
-        runBlocking{
+        runBlocking {
             eventService.saveEvent(
                 Event.of(
                     Event.EventAction.SAVEUSER,
@@ -104,7 +111,7 @@ internal class EventRouterTest(
 
     @Test
     fun `list of one if repository contains one element on get by action lower case action`() {
-        runBlocking{
+        runBlocking {
             eventService.saveEvent(
                 Event.of(
                     Event.EventAction.SAVEUSER,
@@ -125,7 +132,7 @@ internal class EventRouterTest(
 
     @Test
     fun `error if bad request in action `() {
-        runBlocking{
+        runBlocking {
             eventService.saveEvent(
                 Event.of(
                     Event.EventAction.SAVEUSER,
@@ -139,25 +146,30 @@ internal class EventRouterTest(
                 .exchange()
                 .expectStatus()
                 .isBadRequest
-                .expectBodyList<EventHandler.BadEventAction>()
-                .hasSize(1)
+                .expectHeader()
+                .valueMatches("error",messageSource.getMessage("BadEventAction", null, Locale.US))
         }
     }
 
     @Test
     fun `list of one ,single element with specified date `() {
-        runBlocking{
-            val date = LocalDate.now()
-            eventService.saveEvent(
+        runBlocking {
+            val date = Date(2020,5,5)
+            val event =
                 Event.of(
                     Event.EventAction.SAVEUSER,
                     "x",
-                    LocalDateTime.now()
-                ).get()
+                    LocalDateTime.of(2020,5,5,1,1,1)
+                )
+            println(event.isRight)
+            eventService.saveEvent(
+                event.get()
             )
             webTestClient
-                .get()
-                .uri("/events/date/$date")
+                .post()
+                .uri("/events/date")
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(date))
                 .exchange()
                 .expectStatus()
                 .isOk
@@ -168,48 +180,53 @@ internal class EventRouterTest(
 
     @Test
     fun `bad request on specific bad format date `() {
-        runBlocking{
-            val date = 2020/20/50
-            eventService.saveEvent(
-                Event.of(
-                    Event.EventAction.SAVEUSER,
-                    "x",
-                    LocalDateTime.now()
-                ).get()
-            )
+        runBlocking {
+            val date2 = Date(1,1,2022)
+                eventService.saveEvent(
+                    Event.of(
+                        Event.EventAction.SAVEUSER,
+                        "x",
+                        LocalDateTime.of(2022,1,1,1,1)
+                    ).get()
+                )
             webTestClient
-                .get()
-                .uri("/events/date/$date")
+                .post()
+                .uri("/events/date")
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(date2))
                 .exchange()
                 .expectStatus()
                 .isBadRequest
-                .expectBodyList<EventHandler.BadDatesInRequest>()
-                .hasSize(1)
+                .expectHeader()
+                .valueMatches("error",messageSource.getMessage("DateError", null, Locale.US))
         }
     }
 
     @Test
     fun `two element on date range `() {
-        runBlocking{
-            val startDate = LocalDate.now().minusDays(5)
-            val endDate = LocalDate.now()
+        runBlocking {
+            val date1 = Date(2017,1,1)
+            val date2 = Date(2022,1,1)
             eventService.saveEvent(
                 Event.of(
                     Event.EventAction.SAVEUSER,
                     "x",
-                    LocalDateTime.now().minusDays(3)
+                    LocalDateTime.now().minusYears(1)
                 ).get()
             )
             eventService.saveEvent(
                 Event.of(
                     Event.EventAction.SAVEUSER,
                     "mmm",
-                    LocalDateTime.now().minusDays(3)
+                    LocalDateTime.now().minusYears(1)
                 ).get()
             )
+            val dateVal = DateRange(date1,date2)
             webTestClient
-                .get()
-                .uri("/events/daterange/$startDate/$endDate")
+                .post()
+                .uri("/events/daterange")
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(dateVal))
                 .exchange()
                 .expectStatus()
                 .isOk
@@ -217,10 +234,42 @@ internal class EventRouterTest(
                 .hasSize(2)
         }
     }
+    @Test
+    fun `bad request when start date is after end date two element on date range `() {
+        runBlocking {
+            val date1 = Date(2021,1,1)
+            val date2 = Date(2020,1,1)
+            eventService.saveEvent(
+                Event.of(
+                    Event.EventAction.SAVEUSER,
+                    "x",
+                    LocalDateTime.now().minusYears(1)
+                ).get()
+            )
+            eventService.saveEvent(
+                Event.of(
+                    Event.EventAction.SAVEUSER,
+                    "mmm",
+                    LocalDateTime.now().minusYears(1)
+                ).get()
+            )
+            val dateVal = DateRange(date1,date2)
+            webTestClient
+                .post()
+                .uri("/events/daterange")
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(dateVal))
+                .exchange()
+                .expectStatus()
+                .isBadRequest
+                .expectHeader()
+                .valueMatches("error",messageSource.getMessage("EndDateBeforeStartDateError", null, Locale.US))
+        }
+    }
 
     @Test
     fun `one element on object id `() {
-        runBlocking{
+        runBlocking {
             val objectId = "objectId"
             eventService.saveEvent(
                 Event.of(
@@ -242,7 +291,7 @@ internal class EventRouterTest(
 
     @Test
     fun `zero element on object id `() {
-        runBlocking{
+        runBlocking {
             webTestClient
                 .get()
                 .uri("/events/objectId/xx")

@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 @DirtiesContext
 @ContextConfiguration(initializers = [Initializer::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class DatabaseRepositoryTest(
+internal class DatabaseDatabaseRepositoryTest(
     @Autowired private val databaseRepository: DatabaseRepository,
     @Autowired private val reactiveDatabaseRepository: ReactiveDatabaseRepository
 ) {
