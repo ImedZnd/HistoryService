@@ -8,7 +8,7 @@ spring:
       mode: always
   cloud:
     function:
-      definition: flagPersonQueueListener;savePersonQueueListener;updatePersonQueueListener;deletePersonQueueListener;flagTransactionQueueListener;
+      definition: flagPersonQueueListener;savePersonQueueListener;updatePersonQueueListener;deletePersonQueueListener;flagTransactionQueueListener;fraudPersonQueueListener;unFraudPersonQueueListener;
     stream:
       bindings:
         flagPersonQueueListener-in-0:
@@ -26,6 +26,13 @@ spring:
         flagTransactionQueueListener-in-0:
           destination: flagtransactionexchange
           group: flagtransactionqueue
+        fraudPersonQueueListener-in-0:
+          destination: fraudpersonexchange
+          group: fraudpersonqueue
+        unfraudPersonQueueListener-in-0:
+          destination: unfraudpersonexchange
+          group: unfraudpersonqueue
+
       rabbit:
         bindings:
           flagPersonQueueListener-in-0:
@@ -61,5 +68,19 @@ spring:
               queueNameGroupOnly: true
               binding-routing-key-delimiter: ","
               bindingRoutingKey: "flagtransactionroutingkey"
+              exchangeType: direct
+              autoBindDlq: false
+          fraudPersonQueueListener-in-0:
+            consumer:
+              queueNameGroupOnly: true
+              binding-routing-key-delimiter: ","
+              bindingRoutingKey: "fraudpersonroutingkey"
+              exchangeType: direct
+              autoBindDlq: false
+          unfraudPersonQueueListener-in-0:
+            consumer:
+              queueNameGroupOnly: true
+              binding-routing-key-delimiter: ","
+              bindingRoutingKey: "unfraudpersonroutingkey"
               exchangeType: direct
               autoBindDlq: false

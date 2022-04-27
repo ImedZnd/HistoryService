@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 data class Date(
     val year: Int,
     val month: Int,
-    val dayofmonth: Int,
+    val dayOfMonth: Int,
     val hour: Int = 0,
     val minute: Int = 0,
     val second: Int = 0,
@@ -19,7 +19,7 @@ data class Date(
                 LocalDateTime.of(
                     year,
                     month,
-                    dayofmonth,
+                    dayOfMonth,
                     hour,
                     minute,
                     second

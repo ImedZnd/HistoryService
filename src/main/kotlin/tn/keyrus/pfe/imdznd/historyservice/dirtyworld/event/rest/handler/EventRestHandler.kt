@@ -81,7 +81,6 @@ class EventRestHandler(
         else
             either.left.badRequestError()
 
-
     private suspend fun DateRange.DateRangeError.badRequestError(): ServerResponse {
         return badRequest()
             .header(

@@ -28,6 +28,14 @@ class EventQueueHandler(
         createEvent(Event.EventAction.FLAGTRANSACTION, objectId)
     }
 
+    suspend fun fraudPersonHandler(objectId: String) {
+        createEvent(Event.EventAction.FRAUDUSER, objectId)
+    }
+
+    suspend fun unfraudPersonHandler(objectId: String) {
+        createEvent(Event.EventAction.UNFRAUDUSER, objectId)
+    }
+
     private suspend fun createEvent(
         action: Event.EventAction,
         objectId: String

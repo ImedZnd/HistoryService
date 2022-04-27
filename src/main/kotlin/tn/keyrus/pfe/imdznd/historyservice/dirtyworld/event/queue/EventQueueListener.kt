@@ -60,6 +60,26 @@ class EventQueueListener(
                 )
             }
         }
+
+    @Bean
+    fun fraudPersonQueueListener() =
+        Consumer { message: Message<String> ->
+            runBlocking {
+                eventQueueHandler.fraudPersonHandler(
+                    message.payload
+                )
+            }
+        }
+
+    @Bean
+    fun unFraudPersonQueueListener() =
+        Consumer { message: Message<String> ->
+            runBlocking {
+                eventQueueHandler.unfraudPersonHandler(
+                    message.payload
+                )
+            }
+        }
 }
 
 
