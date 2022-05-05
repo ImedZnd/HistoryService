@@ -15,7 +15,6 @@ import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.model.Event
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.service.EventService
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dto.EventDTO
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.repository.ReactiveDatabaseRepository
-import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.rest.handler.EventRestHandler
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.framework.initializer.Initializer
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.DateRange
@@ -161,7 +160,6 @@ internal class EventRouterTest(
                     "x",
                     LocalDateTime.of(2020,5,5,1,1,1)
                 )
-            println(event.isRight)
             eventService.saveEvent(
                 event.get()
             )
@@ -264,6 +262,38 @@ internal class EventRouterTest(
                 .isBadRequest
                 .expectHeader()
                 .valueMatches("error",messageSource.getMessage("EndDateBeforeStartDateError", null, Locale.US))
+        }
+    }
+    @Test
+    fun `bad request when start date in not valid two element on date range `() {
+        runBlocking {
+            val date1 = Date(2021,20,50)
+            val date2 = Date(2020,1,1)
+            eventService.saveEvent(
+                Event.of(
+                    Event.EventAction.SAVEUSER,
+                    "x",
+                    LocalDateTime.now().minusYears(1)
+                ).get()
+            )
+            eventService.saveEvent(
+                Event.of(
+                    Event.EventAction.SAVEUSER,
+                    "mmm",
+                    LocalDateTime.now().minusYears(1)
+                ).get()
+            )
+            val dateVal = DateRange(date1,date2)
+            webTestClient
+                .post()
+                .uri("/events/daterange")
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(dateVal))
+                .exchange()
+                .expectStatus()
+                .isBadRequest
+                .expectHeader()
+                .valueMatches("error",messageSource.getMessage("DateIsNotValidError", null, Locale.US))
         }
     }
 
