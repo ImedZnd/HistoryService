@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.server.ServerResponse.ok
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.model.Event
 import tn.keyrus.pfe.imdznd.historyservice.cleanworld.event.service.EventService
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dto.EventDTO
-import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dto.EventDTO.Builder.toEventDTO
+import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.event.dto.EventDTO.Companion.toEventDTO
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.Date.Companion.toDate
 import tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model.DateRange

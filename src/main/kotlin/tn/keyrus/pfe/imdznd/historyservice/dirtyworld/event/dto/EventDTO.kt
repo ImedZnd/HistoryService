@@ -9,7 +9,7 @@ data class EventDTO(
     val objectId: String,
     val eventTime: Date
 ) {
-    companion object Builder {
+    companion object {
         fun Event.toEventDTO() =
             EventDTO(
                 action,
