@@ -2,12 +2,13 @@ package tn.keyrus.pfe.imdznd.historyservice.dirtyworld.model
 
 import io.vavr.control.Either
 import java.time.DateTimeException
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class Date(
     val year: Int,
     val month: Int,
-    val dayofmonth: Int,
+    val dayOfMonth: Int,
     val hour: Int = 0,
     val minute: Int = 0,
     val second: Int = 0,
@@ -19,7 +20,7 @@ data class Date(
                 LocalDateTime.of(
                     year,
                     month,
-                    dayofmonth,
+                    dayOfMonth,
                     hour,
                     minute,
                     second
@@ -28,6 +29,19 @@ data class Date(
         } catch (dateTimeException: DateTimeException) {
             Either.left(DateError)
         }
+    fun toLocalDate(): Either<DateError, LocalDate> =
+        try {
+            Either.right(
+                LocalDate.of(
+                    year,
+                    month,
+                    dayOfMonth,
+                )
+            )
+        } catch (dateTimeException: DateTimeException) {
+            Either.left(DateError)
+        }
+
 
     companion object {
 

@@ -172,4 +172,48 @@ internal class EventQueueListenerTest(
             }
         }
     }
+
+    @Test
+    fun `fraud person consumer`() {
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                val userId = "userId"
+                rabbitTemplate.convertAndSend(
+                    "fraudpersonexchange",
+                    "fraudpersonroutingkey",
+                    userId
+                )
+                Thread.sleep(1000)
+                val result = eventService.getAllEvents().count()
+                val detailRes = eventService.getAllEventByObjectId(userId).first()
+                assertAll(
+                    {assert(result == 1)},
+                    {assert(detailRes.objectId == userId)},
+                    {assert(detailRes.action == Event.EventAction.FRAUDUSER)}
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `unFraud person consumer`() {
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                val userId = "userId"
+                rabbitTemplate.convertAndSend(
+                    "unfraudpersonexchange",
+                    "unfraudpersonroutingkey",
+                    userId
+                )
+                Thread.sleep(1000)
+                val result = eventService.getAllEvents().count()
+                val detailRes = eventService.getAllEventByObjectId(userId).first()
+                assertAll(
+                    {assert(result == 1)},
+                    {assert(detailRes.objectId == userId)},
+                    {assert(detailRes.action == Event.EventAction.UNFRAUDUSER)}
+                )
+            }
+        }
+    }
 }

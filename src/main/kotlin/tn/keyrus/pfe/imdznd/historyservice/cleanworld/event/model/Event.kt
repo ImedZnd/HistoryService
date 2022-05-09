@@ -88,6 +88,8 @@ class Event private constructor(
         UPDATEUSER,
         DELETEUSER,
         FLAGUSER,
+        FRAUDUSER,
+        UNFRAUDUSER,
         FLAGTRANSACTION
     }
 

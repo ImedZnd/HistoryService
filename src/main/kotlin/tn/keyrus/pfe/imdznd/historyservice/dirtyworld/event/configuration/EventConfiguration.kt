@@ -29,7 +29,7 @@ class EventConfiguration {
     @Bean
     fun eventHandler(
         eventService: EventService,
-        @Autowired messageSource: MessageSource
+        messageSource: MessageSource
     ) =
         EventRestHandler(eventService,messageSource)
 
